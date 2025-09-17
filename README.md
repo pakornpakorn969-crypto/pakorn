@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title> ระบบเช็คชื่อนักศึกษา </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* ฟอนต์ Google */
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(to right, #74ebd5, #ACB6E5);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            margin-top: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #attendanceSection {
+            display: none;
+        }
+
+        table {
+            margin: 30px auto;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #965d1b;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #d1b8b8;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        @media (max-width: 600px) {
+            input[type="text"], input[type="password"] {
+                width: 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>เข้าสู่ระบบเช็คชื่อ</h1>
+
+        <div id="loginSection">
+            <input type="text" id="username" placeholder="ชื่อผู้ใช้">
+            <br>
+            <input type="password" id="password" placeholder="รหัสผ่าน">
+            <br>
+            <button onclick="login()">เข้าสู่ระบบ</button>
+        </div>
+ 
+        รหัสผ่าน เช่น 11111
+
+        <div id="attendanceSection">
+            <h2>ระบบเช็คชื่อภายใน</h2>
+            <input type="text" id="nameInput" placeholder="กรอกชื่อ-นามสกุล">
+            <br>
+            <button onclick="checkIn()">เช็คชื่อ</button>
+
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>ชื่อ</th>
+                        <th>เวลา</th>
+                        <th>ลบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- แสดงข้อมูลที่นี่ -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const USER = "pakorn";
+        const PASS = "45678";
+
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (username === USER && password === PASS) {
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("attendanceSection").style.display = "block";
+            } else {
+                alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+            }
+        }
+
+        function checkIn() {
+            const name = document.getElementById("nameInput").value.trim();
+            if (name === "") {
+                alert("กรุณากรอกชื่อก่อนเช็คชื่อ");
+                return;
+            }
+
+            count++;
+            const table = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            const cell1 = newRow.insertCell(0);
+            const cell2 = newRow.insertCell(1);
+            const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
+
+            const time = new Date().toLocaleTimeString();
+
+            cell1.innerHTML = count;
+            cell2.innerHTML = name;
+            cell3.innerHTML = time;
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerText = "ลบ";
+            deleteBtn.className = "delete-btn";
+            deleteBtn.onclick = function () {
+                table.deleteRow(newRow.rowIndex - 1);
+                recount();
+            };
+
+            cell4.appendChild(deleteBtn);
+            document.getElementById("nameInput").value = "";
+        }
+
+        function recount() {
+            const rows = document.querySelectorAll("#attendanceTable tbody tr");
+            count = 0;
+            rows.forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
+                count++;
+            });
+        }
+    </script>
+
+</body>
+</html>
